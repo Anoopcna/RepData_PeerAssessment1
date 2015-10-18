@@ -41,7 +41,7 @@ Steps=aggregate(steps~interval,Data,mean)[,c(1,2)]
 names(Steps)=c("Intervals","Averages")
 plot(x=Steps$Intervals,y=Steps$Averages,type="l",xlab="Intervals",ylab="Averaged steps",main="Time Series Graph for Number of Steps")
 ```
-
+##around the interval between 900-950 contains the max steps.
 # Imputing missing values
 The Total number of missing values in the Dataset.
 ```{r}
