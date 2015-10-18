@@ -79,8 +79,8 @@ qplot(Total_steps_per_day$steps,xlab='Steps',geom=&quot;histogram&quot;,ylab='Co
 <pre class="r"><code>##barplat
 ##plot(x=Total_steps_per_day$day,y=Total_steps_per_day$steps,xlab='Steps',ylab='Count of steps')</code></pre>
 </div>
-<div id="what-is-mean-total-number-of-steps-taken-per-day" class="section level1">
-<h1>What is mean total number of steps taken per day?</h1>
+<div id="what-is-mean-and-median-total-number-of-steps-taken-each-day" class="section level1">
+<h1>What is mean and Median total number of steps taken each day?</h1>
 <pre class="r"><code>##Mean and Median number of steps for each Day.
 Mean_Meadian=cbind(aggregate(steps~date,Data,mean)[,c(1,2)],aggregate(steps~date,Data,median)[,2])
 names(Mean_Meadian)=c(&quot;Dates&quot;,&quot;Mean&quot;,&quot;Median&quot;)
