@@ -1,25 +1,126 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Loading and preprocessing the data
+```{r}
+##To set the file path.
+setwd("E:\\Anoop\\Books\\Data Science\\CourseTutorials\\ReproducibleResearch\\RepData_PeerAssessment1")
+###To LOad the Data set.
+Data=read.csv("activity.csv",header=TRUE,sep=',',na.strings="NA")
+##To remove Na vAlue from the Steps column
+Data=na.omit(Dataset)
+Total_steps_per_day=aggregate(steps~date,Dataset,sum)
+library(ggplot2)
+##Plot Histogram
+qplot(Total_steps_per_day$steps,xlab='Steps',geom="histogram",ylab='Count of steps')
+##barplat
+##plot(x=Total_steps_per_day$day,y=Total_steps_per_day$steps,xlab='Steps',ylab='Count of steps')
+
+```
+# What is mean total number of steps taken per day?
+```{r}
+##Mean and Median number of steps for each Day.
+Mean_Meadian=cbind(aggregate(steps~date,Data,mean)[,c(1,2)],aggregate(steps~date,Data,median)[,2])
+names(Mean_Meadian)=c("Dates","Mean","Median")
+Mean_Meadian
+```
+## The Mean and the Median on the whole are:
+
+###Mean for the Whole Dataset is:
+```{r}
+Mean=mean(Data$steps)
+Mean
+```
+###Median for the Whole Dataset is:
+```{r}
+Median=median(Data$steps)
+Median
+```
 
 
-## Loading and preprocessing the data
+#What is the average daily activity pattern?
+```{r}
+Steps=aggregate(steps~interval,Data,mean)[,c(1,2)]
+names(Steps)=c("Intervals","Averages")
+plot(x=Steps$Intervals,y=Steps$Averages,type="l",xlab="Intervals",ylab="Averaged steps",main="Time Series Graph for Number of Steps")
+```
+
+# Imputing missing values
+The Total number of missing values in the Dataset.
+```{r}
+Complete_data=read.csv("activity.csv",header=TRUE,sep=',',na.strings="NA")
+nrow(Complete_data[complete.cases(Complete_data)==FALSE,c(1,2,3)])
+```
+Imputation Procedure
+```{r}
+ Data_without_Na=na.omit(Complete_data)
+ Data_only_NA=Complete_data[complete.cases(Complete_data)==FALSE,c(1,2,3)]
+
+##Function to calculate Mean according to Interval
+imputes=function(x)
+{
+  Means=mean(Data_without_Na[Data_without_Na$interval==x,c(1)])
+  #Means
+  Data_only_NA[Data_only_NA$interval==x,c(1)]=Means
+  #x
+  store=rbind(Data_only_NA[Data_only_NA$interval==x,c(1,2,3)])
+  }
+##loop to populate across all the missing distinct intervals.
+A=imputes(unique(Data_only_NA[1,c(3)]))
+ 
+ ##loop it across all rows
+for(i in  2:nrow(unique(Data_only_NA[c(3)])))
+{
+  row_no=i
+  store=imputes(unique(Data_only_NA[i,c(3)]))
+  A=rbind(A,store)
+  }
+
+# ####Completely Data with the imputed rows.
+
+Completed_data_withimputation=rbind(Data_without_Na,A)
+```
+
+Histogram after Imputation
+```{r}
+Total_steps_per_day_imp=aggregate(steps~date,Completed_data_withimputation,sum)
+library(ggplot2)
+##Plot Histogram
+qplot(Total_steps_per_day_imp$steps,xlab='Steps',geom="histogram",ylab='Count of steps')
+```
+##Mean and Median Daywise after Imputation
+Mean and Median after Imputation
+```{r}
+Mean_Meadian_imp=cbind(aggregate(steps~date,Completed_data_withimputation,mean)[,c(1,2)],aggregate(steps~date,Completed_data_withimputation,median)[,2])
+names(Mean_Meadian_imp)=c("Dates","Mean","Median")
+Mean_Meadian_imp
+
+```
+## The Mean and the Median on the whole are:
+
+###Mean for the Whole Dataset is:
+```{r}
+Mean_imp=mean(Completed_data_withimputation$steps)
+Mean_imp
+```
+###Median for the Whole Dataset is:
+```{r}
+Median_imp=median(Completed_data_withimputation$steps)
+Median_imp
+```
+
+##On the whole, the shape of the histogram looks the same but there are few changes,Data for few days were missing,which got added and is considered after imputation.
+
+# Are there differences in activity patterns between weekdays and weekends?
+
+```{r}
+Completed_data_withimputation$weekdaytype=ifelse(as.POSIXlt(Completed_data_withimputation$date)$wday %in% c(1,2,3,4,5),"WeekDay","WeekEnd")
+```
+##Panel Plot containing Time Series Plot
+```{r}
+library(lattice)
+
+Activity_data_averaged<- aggregate(steps ~ interval + weekdaytype, data=Completed_data_withimputation, mean)
+
+xyplot(steps ~ interval | weekdaytype,Activity_data_averaged ,type = "l", layout = c(1, 2), 
+       xlab = "Interval", ylab = "Number of steps",main='Time Series plot')
+```
 
 
-
-## What is mean total number of steps taken per day?
-
-
-
-## What is the average daily activity pattern?
-
-
-
-## Imputing missing values
-
-
-
-## Are there differences in activity patterns between weekdays and weekends?
